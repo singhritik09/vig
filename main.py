@@ -1,12 +1,8 @@
 from fastapi import FastAPI,HTTPException,status
 from typing import Union
 from pydantic import BaseModel,EmailStr
-from pymongo import MongoClient
 from typing import List
-
-conn=MongoClient("mongodb+srv://ritiksinghis20:hashpassword1199@cluster0.dydw4.mongodb.net")
-db=conn["database1"]
-collection=db["users"]
+from database.connection import collection,itemcollection
 
 app=FastAPI()
 
@@ -15,7 +11,12 @@ class User(BaseModel):
     email:EmailStr
     number:int | None =None
     orders:list | None =None
-
+    
+class Item(BaseModel):
+    name:str
+    price:int
+    description:str
+    
 @app.get("/")
 def home():
     return {"Hello":"User"}
@@ -41,7 +42,7 @@ async def create_user(user:User):
     return user_dict
 
 @app.get("/users/", response_model=List[User])
-async def read_items():
+async def read_users():
     users = list(collection.find())
     return [{**user, "_id": str(user["_id"])} for user in users]
 
@@ -80,3 +81,47 @@ async def delete_user(user_id:int,user:User):
     
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User Not Found")
+
+@app.post("/items",response_model=Item)
+async def add_item(item:Item):
+    item_dict=item.dict()
+    
+    highest_item = itemcollection.find_one(sort=[("item_id", -1)])
+    if highest_item:
+        item_id=highest_item["item_id"]+1
+    else:
+        item_id=1000
+    
+    item_dict["item_id"]=item_id
+    insert=itemcollection.insert_one(item_dict)
+    item_dict["_id"] = str(insert.inserted_id)
+
+    return item_dict
+
+@app.get("/items",response_model=List[Item])
+async def get_items():
+    items = list(itemcollection.find())
+    return items
+
+@app.get("/items/{item_id}",response_model=Item)
+async def get_item(item_id:int):
+    item=itemcollection.find_one({"item_id":item_id})
+    
+    if item:
+        return item
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Item Not Found")
+    
+
+@app.put("/items/{item_id}",response_model=Item)
+async def update_item(item_id:int,item:Item):
+    item_dict=item.dict()
+    updated = itemcollection.update_one({"item_id":item_id},{"$set": item_dict})
+
+    if updated:
+        return item
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Item Not Found")
+
+
+  
