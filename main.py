@@ -1,10 +1,19 @@
-from fastapi import FastAPI,HTTPException,status
+from fastapi import FastAPI,HTTPException,status,UploadFile
 from typing import Union
 from pydantic import BaseModel,EmailStr
 from typing import List
 from database.connection import collection,itemcollection
+from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Add the URL of your frontend
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 
 class User(BaseModel):
     name:str
@@ -17,6 +26,11 @@ class Item(BaseModel):
     price:int
     description:str
     
+class ItemUpload(Item):
+    image: UploadFile |  None
+    tags:List[str] = []
+
+
 @app.get("/")
 def home():
     return {"Hello":"User"}
@@ -123,5 +137,11 @@ async def update_item(item_id:int,item:Item):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Item Not Found")
 
-
-  
+@app.delete("/items/{item_id}")
+async def delete_item(item_id:int):
+    todel=itemcollection.find_one_and_delete({"item_id":item_id})      
+    if todel:
+        return {"Deleted":item_id}
+    
+    else:
+        raise HTTPException 
