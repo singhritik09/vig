@@ -9,7 +9,7 @@ app=FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Add the URL of your frontend
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -60,15 +60,6 @@ async def read_users():
     users = list(collection.find())
     return [{**user, "_id": str(user["_id"])} for user in users]
 
-# @app.get("/users/{user_id}", response_model=User)
-# async def read_user(user_id: int):
-#     user = collection.find_one({"user_id": user_id})
-#     if user:
-#         return {**user}
-#     else:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-
 @app.get("/users/{user_id}",response_model=User)
 async def read_user(user_id: int):
     user = collection.find_one({"user_id": user_id})
@@ -96,8 +87,8 @@ async def delete_user(user_id:int,user:User):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User Not Found")
 
-@app.post("/items",response_model=Item)
-async def add_item(item:Item):
+@app.post("/items",response_model=ItemUpload)
+async def add_item(item:ItemUpload):
     item_dict=item.dict()
     
     highest_item = itemcollection.find_one(sort=[("item_id", -1)])
