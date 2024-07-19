@@ -67,17 +67,17 @@ jobs:
     - name: Login to Dockerhub
       run: docker login --username '${{secrets.DOCKER_USERNAME}}' --password '${{secrets.DOCKER_PASSWORD}}'
     
-      - name: Pull and run frontend container
-        run: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
-          docker run -d --name frontend -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
+    - name: Pull and run frontend container
+      run: |
+        docker pull ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
+        docker run -d --name frontend -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
 
-      - name: Test frontend container
-        run: |
-          sleep 20
-          curl -f http://localhost:3000/ || (docker logs frontend && exit 1)
+    - name: Test frontend container
+      run: |
+        sleep 20
+        curl -f http://localhost:8081/ || (docker logs frontend && exit 1)
 
-      - name: Stop and remove frontend container
-        run: |
-          docker container stop frontend
-          docker container rm frontend
+    - name: Stop and remove frontend container
+      run: |
+        docker container stop frontend
+        docker container rm frontend
