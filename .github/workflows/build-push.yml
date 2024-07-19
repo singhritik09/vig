@@ -75,7 +75,7 @@ jobs:
     - name: Test frontend container
       run: |
         sleep 20
-        curl -f http://localhost:8081/ || (docker logs frontend && exit 1)
+        curl -f http://localhost:3000/ || (docker logs frontend && exit 1)
 
     - name: Stop and remove frontend container
       run: |
