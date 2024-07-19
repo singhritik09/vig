@@ -70,7 +70,7 @@ jobs:
     - name: Pull and run frontend container
       run: |
         docker pull ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
-        docker run -d --name frontend -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
+        docker run -d --name frontend -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
 
     - name: Test frontend container
       run: |
