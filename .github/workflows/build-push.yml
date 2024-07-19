@@ -72,11 +72,10 @@ jobs:
         docker pull ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
         docker run -d --name frontend -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }}
 
-    - name: Wait for frontend container to be ready
-      run: sleep 40 
-    - name: Test frontend container
+    - name: Test container
       run: |
-        curl -v http://localhost:3000/ || (docker logs frontend && exit 1)
+        sleep 40
+        curl -f http://localhost:3000/ || (docker logs frontend && exit 1)
 
     - name: Stop and remove frontend container
       run: |
