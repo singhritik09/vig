@@ -68,7 +68,7 @@ jobs:
       run: docker login --username '${{secrets.DOCKER_USERNAME}}' --password '${{secrets.DOCKER_PASSWORD}}'
     
     - name: Pull Image
-      run: docker image pull '${{ secrets.DOCKER_USERNAME }}/react-frontend:${{ github.sha }} '
+      run: docker image pull '${{ secrets.DOCKER_USERNAME }}'/react-frontend:${{ github.sha }}
 
     - name: Run container
       run: docker run -d --name client_app -p 3000:3000 '${{secrets.DOCKER_USERNAME}}'/react-frontend:'${{github.sha}}'
