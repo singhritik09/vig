@@ -1,13 +1,23 @@
-From node:22
+# Use an LTS version of Node.js
+FROM node:20
 
+# Set working directory inside the container
 WORKDIR /app
 
+# Copy package.json and package-lock.json first (for caching dependencies)
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
-COPY . .
+# Copy the rest of the application files
+COPY --chown=node:node . .
 
+# Set environment variable to ensure proper PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
+# Expose the React development server port
 EXPOSE 3000
 
-CMD [ "npm","run","dev" ]
+# Start the development server
+CMD ["npm", "run", "dev"]
